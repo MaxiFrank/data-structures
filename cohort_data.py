@@ -251,7 +251,7 @@ def get_housemates_for(filename, name):
     for ls in [dumbledores_army, gryffindor, hufflepuff, ravenclaw, slytherin]:
       for tuple_ in ls:
         if tuple_[0] == name:
-          current_cohort = tuple_[1] # why does current cohort and current list dissappear here? functions are only available at their current indent
+          current_cohort = tuple_[1] # variables are only available at their current indent
           current_ls = ls
           break # break only breaks out of the current loop
     
