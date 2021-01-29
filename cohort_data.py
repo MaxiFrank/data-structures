@@ -17,10 +17,13 @@ def all_houses(filename):
 
     houses = set()
 
-    # TODO: replace this with your code
+    open_file = open(filename)
 
+    for line in open_file:
+      house = line.split('|')[2]
+      if house:
+        houses.add(house)
     return houses
-
 
 def students_by_cohort(filename, cohort='All'):
     """Return a list of students' full names by cohort.
@@ -49,10 +52,20 @@ def students_by_cohort(filename, cohort='All'):
     Return:
       - list[list]: a list of lists
     """
+    open_file = open(filename)
+    if cohort == 'All':
+      students = []
+      for line in open_file:
+        clean_line = line.rstrip().split('|')
+        if clean_line[4] != 'I' and clean_line[4] != 'G':
+          students.append(clean_line[0] + ' ' + clean_line[1])
 
-    students = []
-
-    # TODO: replace this with your code
+    if cohort != 'All':
+      students = []
+      for line in open_file:
+        clean_line = line.rstrip().split('|')
+        if clean_line[4] == cohort:
+          students.append(clean_line[0] + ' ' + clean_line[1])
 
     return sorted(students)
 
@@ -72,7 +85,7 @@ def all_names_by_house(filename):
     Each roster is a list of names sorted in alphabetical order.
 
     For example:
-      >>> rosters = hogwarts_by_house('cohort_data.txt')
+      >>> rosters = all_names_by_house('cohort_data.txt')
       >>> len(rosters)
       7
 
@@ -96,10 +109,24 @@ def all_names_by_house(filename):
     ghosts = []
     instructors = []
 
-    # TODO: replace this with your code
-
-    return []
-
+    open_file = open(filename)
+    for line in open_file:
+      first, last, house, _, i_g = line.rstrip().split('|')
+      if house.lower() == "dumbledore's army": # why does lower(house) not work??
+        dumbledores_army.append(first + ' ' + last)
+      if house.lower() == 'gryffindor':
+        gryffindor.append(first + ' ' + last)
+      if house.lower() == 'hufflepuff':
+        hufflepuff.append(first + ' ' + last)
+      if house.lower() == 'ravenclaw':
+        ravenclaw.append(first + ' ' + last)
+      if house.lower() == 'slytherin':
+        slytherin.append(first + ' ' + last)
+      if i_g == 'G':
+        ghosts.append(first + ' ' + last)
+      if i_g == 'I':
+        instructors.append(first + ' ' + last)
+    return [sorted(ls) for ls in [dumbledores_army, gryffindor, hufflepuff, ravenclaw, slytherin, ghosts,instructors]]
 
 def all_data(filename):
     """Return all the data in a file.
@@ -110,7 +137,7 @@ def all_data(filename):
     hold all the data for each person. (full_name, house, advisor, cohort)
 
     For example:
-      >>> all_student_data('cohort_data.txt')
+      >>> all_data('cohort_data.txt')
       [('Harry Potter', 'Gryffindor', 'McGonagall', 'Fall 2015'), ..., ]
 
     Arguments:
@@ -122,7 +149,11 @@ def all_data(filename):
 
     all_data = []
 
-    # TODO: replace this with your code
+    file = open(filename)
+
+    for line in file:
+      first, last, house, advisor, cohort = line.rstrip().split('|')
+      all_data.append((first + ' ' + last, house, advisor, cohort))
 
     return all_data
 
@@ -148,14 +179,20 @@ def get_cohort_for(filename, name):
       - str: the person's cohort or None
     """
 
-    # TODO: replace this with your code
+    file = open(filename)
+
+    for line in file:
+      first, last, house, advisor, cohort = line.rstrip().split('|')
+      if first + ' ' + last == name:
+        return cohort
+      
 
 
 def find_duped_last_names(filename):
     """Return a set of duplicated last names that exist in the data.
 
     For example:
-      >>> find_name_duplicates('cohort_data.txt')
+      >>> find_duped_last_names(('cohort_data.txt')
       {'Creevey', 'Weasley', 'Patil'}
 
     Arguments:
@@ -164,9 +201,18 @@ def find_duped_last_names(filename):
     Return:
       - set[str]: a set of strings
     """
+    file = open(filename)
 
-    # TODO: replace this with your code
+    all_names = []
+    repeated_names = set()
+    for line in file:
+      first, last, house, advisor, cohort = line.rstrip().split('|')
+      all_names.append(last)
 
+    for idx in range(len(all_names) - 1):
+      if all_names[idx] in all_names[idx+1:]:
+        repeated_names.add(all_names[idx])
+    return list(repeated_names)
 
 def get_housemates_for(filename, name):
     """Return a set of housemates for the given student.
@@ -179,13 +225,47 @@ def get_housemates_for(filename, name):
     >>> get_housemates_for('cohort_data.txt', 'Hermione Granger')
     {'Angelina Johnson', ..., 'Seamus Finnigan'}
     """
+    dumbledores_army = [] #list of list of tuples
+    gryffindor = []
+    hufflepuff = []
+    ravenclaw = []
+    slytherin = []
 
-    # TODO: replace this with your code
+    open_file = open(filename)
+    for line in open_file:
+      first, last, house, advisor, cohort = line.rstrip().split('|')
+      if house.lower() == "dumbledore's army":
+        dumbledores_army.append((first + ' ' + last, cohort))
+      if house.lower() == 'gryffindor':
+        gryffindor.append((first + ' ' + last, cohort))
+      if house.lower() == 'hufflepuff':
+        hufflepuff.append((first + ' ' + last, cohort))
+      if house.lower() == 'ravenclaw':
+        ravenclaw.append((first + ' ' + last, cohort))
+      if house.lower() == 'slytherin':
+        slytherin.append((first + ' ' + last, cohort))
+      
+    current_cohort = None
+    current_ls = None
 
+    for ls in [dumbledores_army, gryffindor, hufflepuff, ravenclaw, slytherin]:
+      for tuple_ in ls:
+        if tuple_[0] == name:
+          current_cohort = tuple_[1] # why does current cohort and current list dissappear here? functions are only available at their current indent
+          current_ls = ls
+          break # break only breaks out of the current loop
+    
+    classmate_set = set()
+    for tuple_ in current_ls:
+      if tuple_[1] == current_cohort:
+        classmate_set.add(tuple_[0])
+    classmate_set.remove(name)
+    
+    return classmate_set
 
-##############################################################################
-# END OF MAIN EXERCISE.  Yay!  You did it! You Rock!
-#
+# ##############################################################################
+# # END OF MAIN EXERCISE.  Yay!  You did it! You Rock!
+
 
 if __name__ == '__main__':
     import doctest
